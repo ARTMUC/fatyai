@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS profiles (
+    id               CHAR(36)     NOT NULL DEFAULT (UUID()),
+    user_id          CHAR(36)     NOT NULL,
+    gender           VARCHAR(10)  NOT NULL DEFAULT '',
+    birth_year       INT          NOT NULL DEFAULT 0,
+    height_cm        DOUBLE       NOT NULL DEFAULT 0,
+    weight_kg        DOUBLE       NOT NULL DEFAULT 0,
+    activity_level   VARCHAR(20)  NOT NULL DEFAULT '',
+    goal_kg_per_week DOUBLE       NOT NULL DEFAULT 0,
+    tdee             DOUBLE       NOT NULL DEFAULT 0,
+    target_calories  DOUBLE       NOT NULL DEFAULT 0,
+    safety_floor     DOUBLE       NOT NULL DEFAULT 1200,
+    onboarded        TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at       DATETIME     NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_profiles_user_id (user_id),
+    KEY idx_profiles_user_id_id (user_id, id),
+    CONSTRAINT fk_profiles_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,14 @@
+package partials
+
+import (
+	"fmt"
+
+	weightapplication "github.com/artmuc/fatyai/internal/application/weight"
+)
+
+templ WeightRow(e weightapplication.WeightEntryDTO) {
+	<div class="flex items-center justify-between py-1">
+		<span class="text-xs text-gray-500">{ e.MeasuredAt.Format("2006-01-02") }</span>
+		<span class="text-sm font-semibold text-gray-800">{ fmt.Sprintf("%.1f kg", e.WeightKg) }</span>
+	</div>
+}

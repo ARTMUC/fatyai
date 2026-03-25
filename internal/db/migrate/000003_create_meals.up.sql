@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS meals (
+    id            CHAR(36)     NOT NULL DEFAULT (UUID()),
+    user_id       CHAR(36)     NOT NULL,
+    name          VARCHAR(255) NOT NULL DEFAULT '',
+    calories_kcal DOUBLE       NOT NULL DEFAULT 0,
+    protein_g     DOUBLE       NOT NULL DEFAULT 0,
+    fat_g         DOUBLE       NOT NULL DEFAULT 0,
+    carbs_g       DOUBLE       NOT NULL DEFAULT 0,
+    weight_g      DOUBLE       NOT NULL DEFAULT 0,
+    estimated     TINYINT(1)   NOT NULL DEFAULT 0,
+    source        VARCHAR(20)  NOT NULL DEFAULT 'manual',
+    eaten_at      DATETIME     NOT NULL,
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at    DATETIME     NULL,
+    PRIMARY KEY (id),
+    KEY idx_meals_user_id_id (user_id, id),
+    KEY idx_meals_user_eaten_at (user_id, eaten_at),
+    CONSTRAINT fk_meals_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

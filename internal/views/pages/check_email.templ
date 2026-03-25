@@ -1,0 +1,34 @@
+package pages
+
+templ CheckEmailPage(email string) {
+	<!DOCTYPE html>
+	<html lang="pl">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="theme-color" content="#22c55e"/>
+			<title>Sprawdź email — Kalorie AI</title>
+			<link rel="stylesheet" href="/static/app.css"/>
+		</head>
+		<body class="bg-gray-50 min-h-screen flex items-center justify-center px-4">
+			<div class="w-full max-w-sm text-center">
+				<span class="text-green-600 font-bold text-3xl">Kalorie AI</span>
+				<div class="bg-white rounded-2xl p-8 shadow-sm mt-6 space-y-4">
+					<div class="text-5xl">📬</div>
+					<h2 class="text-xl font-bold text-gray-800">Sprawdź swoją skrzynkę</h2>
+					<p class="text-gray-500 text-sm">
+						Wysłaliśmy link aktywacyjny na adres
+						<span class="font-medium text-gray-700">{ email }</span>.
+						Kliknij w link, aby aktywować konto.
+					</p>
+					<p class="text-gray-400 text-xs">
+						Nie widzisz maila? Sprawdź folder spam.
+					</p>
+					<a href="/login" class="block text-green-600 text-sm font-medium hover:underline mt-2">
+						Wróć do logowania
+					</a>
+				</div>
+			</div>
+		</body>
+	</html>
+}

@@ -1,0 +1,70 @@
+package partials
+
+import (
+	"fmt"
+	"strconv"
+	"time"
+
+	mealapplication "github.com/artmuc/fatyai/internal/application/meal"
+)
+
+templ MealConfirmForm(draft mealapplication.MealDTO) {
+	<div class="bg-white rounded-2xl p-6 shadow-sm mt-4">
+		<h3 class="font-semibold text-gray-800 mb-4">Potwierdź posiłek</h3>
+		<form
+			hx-post="/meals"
+			hx-target="body"
+			hx-swap="none"
+			hx-on::after-request="if(event.detail.successful) window.location.href='/journal'"
+			class="space-y-3"
+		>
+			<div>
+				<label class="block text-xs font-medium text-gray-600 mb-1">Nazwa</label>
+				<input type="text" name="name" value={ draft.Name } required
+					class="w-full border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"/>
+			</div>
+			<div class="grid grid-cols-2 gap-3">
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Kalorie (kcal)</label>
+					<input type="number" name="calories_kcal" value={ fmt.Sprintf("%.0f", draft.CaloriesKcal) } step="1"
+						class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Waga (g)</label>
+					<input type="number" name="weight_g" value={ fmt.Sprintf("%.0f", draft.WeightG) } step="1"
+						class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				</div>
+			</div>
+			<div class="grid grid-cols-3 gap-3">
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Białko (g)</label>
+					<input type="number" name="protein_g" value={ fmt.Sprintf("%.1f", draft.ProteinG) } step="0.1"
+						class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Tłuszcz (g)</label>
+					<input type="number" name="fat_g" value={ fmt.Sprintf("%.1f", draft.FatG) } step="0.1"
+						class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-600 mb-1">Węgl. (g)</label>
+					<input type="number" name="carbs_g" value={ fmt.Sprintf("%.1f", draft.CarbsG) } step="0.1"
+						class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				</div>
+			</div>
+			<div>
+				<label class="block text-xs font-medium text-gray-600 mb-1">Godzina</label>
+				<input type="datetime-local" name="eaten_at" value={ time.Now().Format("2006-01-02T15:04") }
+					class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+			</div>
+			<input type="hidden" name="estimated" value={ strconv.FormatBool(draft.Estimated) }/>
+			<input type="hidden" name="source" value="scan"/>
+			if draft.Estimated {
+				<p class="text-xs text-amber-500">~ Waga została oszacowana przez AI.</p>
+			}
+			<button type="submit" class="w-full bg-green-500 text-white font-semibold rounded-xl py-3 hover:bg-green-600">
+				Zapisz posiłek
+			</button>
+		</form>
+	</div>
+}

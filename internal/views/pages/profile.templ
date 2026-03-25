@@ -1,0 +1,82 @@
+package pages
+
+import (
+	"fmt"
+	"strconv"
+
+	profileapplication "github.com/artmuc/fatyai/internal/application/profile"
+	"github.com/artmuc/fatyai/internal/views/layout"
+)
+
+templ ProfilePage(p profileapplication.ProfileDTO) {
+	@layout.Base("Profil", true) {
+		<div class="py-4">
+			<h2 class="text-xl font-bold text-gray-800 mb-4">Twój profil</h2>
+			<!-- Stats summary -->
+			<div class="grid grid-cols-2 gap-3 mb-6">
+				<div class="bg-white rounded-2xl p-4 shadow-sm text-center">
+					<p class="text-xs text-gray-400 mb-1">TDEE</p>
+					<p class="text-2xl font-bold text-gray-800">{ fmt.Sprintf("%.0f", p.TDEE) }</p>
+					<p class="text-xs text-gray-400">kcal/dzień</p>
+				</div>
+				<div class="bg-white rounded-2xl p-4 shadow-sm text-center">
+					<p class="text-xs text-gray-400 mb-1">Cel</p>
+					<p class="text-2xl font-bold text-green-600">{ fmt.Sprintf("%.0f", p.TargetCalories) }</p>
+					<p class="text-xs text-gray-400">kcal/dzień</p>
+				</div>
+			</div>
+			<!-- Edit form -->
+			<form
+				hx-post="/profile"
+				hx-target="#profile-content"
+				hx-swap="outerHTML"
+				id="profile-content"
+				class="bg-white rounded-2xl p-6 shadow-sm space-y-4"
+			>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Płeć</label>
+					<select name="gender" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+						<option value="male" selected?={ p.Gender == "male" }>Mężczyzna</option>
+						<option value="female" selected?={ p.Gender == "female" }>Kobieta</option>
+					</select>
+				</div>
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Rok urodzenia</label>
+						<input type="number" name="birth_year" value={ strconv.Itoa(p.BirthYear) } class="w-full border border-gray-300 rounded-xl px-4 py-3"/>
+					</div>
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-1">Wzrost (cm)</label>
+						<input type="number" name="height_cm" value={ fmt.Sprintf("%.1f", p.HeightCm) } step="0.5" class="w-full border border-gray-300 rounded-xl px-4 py-3"/>
+					</div>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Waga (kg)</label>
+					<input type="number" name="weight_kg" value={ fmt.Sprintf("%.1f", p.WeightKg) } step="0.1" class="w-full border border-gray-300 rounded-xl px-4 py-3"/>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Aktywność fizyczna</label>
+					<select name="activity_level" class="w-full border border-gray-300 rounded-xl px-4 py-3">
+						<option value="sedentary" selected?={ p.ActivityLevel == "sedentary" }>Siedząca</option>
+						<option value="light" selected?={ p.ActivityLevel == "light" }>Lekka</option>
+						<option value="moderate" selected?={ p.ActivityLevel == "moderate" }>Umiarkowana</option>
+						<option value="active" selected?={ p.ActivityLevel == "active" }>Aktywna</option>
+						<option value="very_active" selected?={ p.ActivityLevel == "very_active" }>Bardzo aktywna</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-sm font-medium text-gray-700 mb-1">Cel (kg/tydz.)</label>
+					<input type="number" name="goal_kg_per_week" value={ fmt.Sprintf("%.2f", p.GoalKgPerWeek) } step="0.1" min="0" max="1" class="w-full border border-gray-300 rounded-xl px-4 py-3"/>
+				</div>
+				<button type="submit" class="w-full bg-green-500 text-white font-semibold rounded-xl py-3 hover:bg-green-600 transition-colors">
+					Zaktualizuj profil
+				</button>
+			</form>
+			<form method="POST" action="/logout" class="mt-4">
+				<button type="submit" class="w-full bg-gray-100 text-gray-600 font-medium rounded-xl py-3 hover:bg-gray-200 transition-colors">
+					Wyloguj się
+				</button>
+			</form>
+		</div>
+	}
+}

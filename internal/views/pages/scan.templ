@@ -1,0 +1,71 @@
+package pages
+
+import "github.com/artmuc/fatyai/internal/views/layout"
+
+templ ScanPage() {
+	@layout.Base("Skanuj posiłek", true) {
+		<div class="py-4">
+			<h2 class="text-xl font-bold text-gray-800 mb-4">Skanuj posiłek</h2>
+			<form
+				id="scan-form"
+				hx-post="/meals/scan"
+				hx-encoding="multipart/form-data"
+				hx-target="#scan-result"
+				hx-swap="innerHTML"
+				hx-indicator="#scan-spinner"
+				class="space-y-4"
+			>
+				<div class="bg-white rounded-2xl p-6 shadow-sm text-center">
+					<label class="cursor-pointer block">
+						<div id="preview-container" class="mb-4 hidden">
+							<img id="photo-preview" class="w-full rounded-xl max-h-64 object-cover" alt=""/>
+						</div>
+						<div id="upload-placeholder" class="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-green-400 transition-colors">
+							<svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+							</svg>
+							<p class="text-gray-500">Zrób zdjęcie lub wybierz z galerii</p>
+							<p class="text-gray-400 text-sm mt-1">JPG, PNG do 10 MB</p>
+						</div>
+						<input
+							type="file" name="photo" id="photo-input"
+							accept="image/*" capture="environment"
+							class="hidden"
+							onchange="previewPhoto(this)"
+						/>
+					</label>
+					<button
+						type="submit"
+						class="mt-4 w-full bg-green-500 text-white font-semibold rounded-xl py-3 hover:bg-green-600 transition-colors"
+					>
+						Analizuj
+					</button>
+				</div>
+			</form>
+			<div id="scan-spinner" class="htmx-indicator text-center py-6">
+				<div class="inline-flex items-center gap-3 bg-white rounded-2xl px-6 py-4 shadow-sm">
+					<svg class="animate-spin w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+					</svg>
+					<span class="text-gray-600">AI analizuje zdjęcie...</span>
+				</div>
+			</div>
+			<div id="scan-result" class="mt-4"></div>
+		</div>
+		<script>
+			function previewPhoto(input) {
+				if (input.files && input.files[0]) {
+					const reader = new FileReader();
+					reader.onload = e => {
+						document.getElementById('photo-preview').src = e.target.result;
+						document.getElementById('preview-container').classList.remove('hidden');
+						document.getElementById('upload-placeholder').classList.add('hidden');
+					};
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+		</script>
+	}
+}

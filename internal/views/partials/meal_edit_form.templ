@@ -1,0 +1,28 @@
+package partials
+
+templ MealEditForm(mealID string) {
+	<li id={ "meal-" + mealID } class="px-4 py-3">
+		<form
+			hx-put={ "/meals/" + mealID }
+			hx-target={ "#meal-" + mealID }
+			hx-swap="outerHTML"
+			class="space-y-2"
+		>
+			<input type="text" name="name" placeholder="Nazwa" required
+				class="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+			<div class="grid grid-cols-2 gap-2">
+				<input type="number" name="calories_kcal" placeholder="kcal" step="1"
+					class="border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+				<input type="number" name="weight_g" placeholder="g" step="1"
+					class="border border-gray-300 rounded-xl px-3 py-2 text-sm"/>
+			</div>
+			<div class="flex gap-2">
+				<button type="submit" class="flex-1 bg-green-500 text-white rounded-xl py-2 text-xs font-medium">Zapisz</button>
+				<button type="button"
+					hx-get={ "/journal" }
+					hx-target="body"
+					class="flex-1 bg-gray-100 text-gray-600 rounded-xl py-2 text-xs font-medium">Anuluj</button>
+			</div>
+		</form>
+	</li>
+}

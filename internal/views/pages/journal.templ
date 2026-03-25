@@ -1,0 +1,131 @@
+package pages
+
+import (
+	"fmt"
+	"time"
+
+	mealapplication "github.com/artmuc/fatyai/internal/application/meal"
+	"github.com/artmuc/fatyai/internal/views/layout"
+	"github.com/artmuc/fatyai/internal/views/partials"
+)
+
+templ JournalPage(journal mealapplication.DailyJournalDTO, date time.Time) {
+	@layout.Base("Dziennik", true) {
+		<div class="py-2">
+			<!-- Date navigation -->
+			<div class="flex items-center justify-between mb-4">
+				<a
+					href={ templ.SafeURL("/journal?date=" + date.AddDate(0, 0, -1).Format("2006-01-02")) }
+					class="p-2 rounded-full hover:bg-gray-100"
+				>
+					<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+					</svg>
+				</a>
+				<h2 class="font-semibold text-gray-800">
+					{ date.Format("Mon, 2 Jan 2006") }
+				</h2>
+				<a
+					href={ templ.SafeURL("/journal?date=" + date.AddDate(0, 0, 1).Format("2006-01-02")) }
+					class="p-2 rounded-full hover:bg-gray-100"
+				>
+					<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+					</svg>
+				</a>
+			</div>
+			<!-- Correction banner (HTMX lazy-loaded) -->
+			<div
+				id="correction-banner"
+				hx-get="/correction/check"
+				hx-trigger="load"
+				hx-swap="innerHTML"
+				class="mb-3"
+			></div>
+			<!-- Daily summary -->
+			<div id="journal-summary" class="mb-4">
+				@partials.JournalSummary(journal)
+			</div>
+			<!-- Weight entry widget -->
+			<div class="bg-white rounded-2xl p-4 shadow-sm mb-4">
+				<p class="text-sm font-medium text-gray-700 mb-2">Poranna waga</p>
+				<form
+					hx-post="/weight"
+					hx-target="#weight-log"
+					hx-swap="afterbegin"
+					class="flex gap-2"
+				>
+					<input
+						type="number" name="weight_kg" placeholder="75.0"
+						min="20" max="300" step="0.1"
+						class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+					/>
+					<button type="submit" class="bg-green-500 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-green-600">
+						Zapisz
+					</button>
+				</form>
+				<div id="weight-log" class="mt-2 space-y-1"></div>
+			</div>
+			<!-- Meals list -->
+			<div class="bg-white rounded-2xl shadow-sm mb-4">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+					<h3 class="font-semibold text-gray-800">Posiłki</h3>
+					<button
+						hx-get="/meals/manual-form"
+						hx-target="#add-meal-form"
+						hx-swap="innerHTML"
+						class="text-green-600 text-sm font-medium hover:text-green-700"
+					>
+						+ Dodaj ręcznie
+					</button>
+				</div>
+				<div id="add-meal-form" class="px-4 py-2"></div>
+				<ul id="meal-list" class="divide-y divide-gray-50">
+					if len(journal.Meals) == 0 {
+						<li class="px-4 py-6 text-center text-gray-400 text-sm">
+							Brak posiłków. Zrób zdjęcie lub dodaj ręcznie.
+						</li>
+					}
+					for _, m := range journal.Meals {
+						@partials.MealRow(m)
+					}
+				</ul>
+			</div>
+			<!-- Activities list -->
+			<div class="bg-white rounded-2xl shadow-sm mb-4">
+				<div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+					<h3 class="font-semibold text-gray-800">Aktywność</h3>
+					<button
+						hx-get="/activities/form"
+						hx-target="#add-activity-form"
+						hx-swap="innerHTML"
+						class="text-green-600 text-sm font-medium hover:text-green-700"
+					>
+						+ Dodaj
+					</button>
+				</div>
+				<div id="add-activity-form" class="px-4 py-2"></div>
+				<ul id="activity-list" class="divide-y divide-gray-50">
+					if len(journal.Activities) == 0 {
+						<li class="px-4 py-6 text-center text-gray-400 text-sm">
+							Brak aktywności.
+						</li>
+					}
+					for _, a := range journal.Activities {
+						@partials.ActivityRow(a)
+					}
+				</ul>
+			</div>
+			<!-- Net calorie balance -->
+			<div class="bg-white rounded-2xl p-4 shadow-sm text-center">
+				<p class="text-sm text-gray-500">Bilans netto</p>
+				<p class={ "text-3xl font-bold", templ.KV("text-green-600", journal.NetCalories <= journal.TargetCalories), templ.KV("text-red-500", journal.NetCalories > journal.TargetCalories) }>
+					{ fmt.Sprintf("%.0f kcal", journal.NetCalories) }
+				</p>
+				<p class="text-xs text-gray-400 mt-1">
+					cel: { fmt.Sprintf("%.0f kcal", journal.TargetCalories) }
+				</p>
+			</div>
+		</div>
+	}
+}
